@@ -15,24 +15,8 @@ public class StatusService {
         this.statusRepository = statusRepository;
     }
 
-    public Status createStatus(Status status) {
-        return statusRepository.save(status);
+    public Status getStatus(EStatus eStatus) {
+        return statusRepository.findByName(eStatus)
+                .orElseThrow(IllegalArgumentException::new);
     }
-
-    public Optional<Status> getStatus(Long id) {
-        return statusRepository.findById(id);
-    }
-
-    public Status updateStatus(Status status) {
-        return statusRepository.save(status);
-    }
-
-    public void deleteStatus(Long id) {
-        statusRepository.deleteById(id);
-    }
-
-    public List<Status> getAllStatuses() {
-        return statusRepository.findAll();
-    }
-
 }

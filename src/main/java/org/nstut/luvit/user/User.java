@@ -2,15 +2,27 @@ package org.nstut.luvit.user;
 
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Email;
+import lombok.Getter;
+import lombok.Setter;
+import lombok.ToString;
 import org.nstut.luvit.gender.Gender;
 import org.nstut.luvit.role.Role;
+import org.nstut.luvit.status.EStatus;
 import org.nstut.luvit.status.Status;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.core.userdetails.UserDetails;
 
 import java.time.LocalDateTime;
+import java.util.Collection;
+import java.util.List;
 
+@Getter
+@Setter
+@ToString
 @Entity
 @Table(name = "`user`")
-public class User {
+public class User implements UserDetails {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -18,8 +30,8 @@ public class User {
     @Column(name = "full_name")
     private String fullName;
 
-    @Column(name = "nick_name")
-    private String nickName;
+    @Column(name = "username")
+    private String username;
 
     @Email
     @Column(name = "email")
@@ -53,64 +65,33 @@ public class User {
     @Column(name = "image_url")
     private String imageUrl;
 
-    public Long getId() {
-        return id;
-    }
-
-    public String getFullName() {
-        return fullName;
-    }
-
-    public String getNickName() {
-        return nickName;
-    }
-
-    public @Email String getEmail() {
-        return email;
-    }
-
-    public String getPassword() {
-        return password;
-    }
-
-    public Integer getAge() {
-        return age;
-    }
-
-    public Status getStatus() {
-        return status;
-    }
-
-    public Role getRole() {
-        return role;
-    }
-
-    public Gender getGender() {
-        return gender;
-    }
-
-    public Gender getPreference() {
-        return preference;
-    }
-
-    public LocalDateTime getCreatedAt() {
-        return createdAt;
-    }
-
-    public String getImageUrl() {
-        return imageUrl;
+    @Override
+    public Collection<? extends GrantedAuthority> getAuthorities() {
+        return List.of(new SimpleGrantedAuthority(role.toString()));
     }
 
     @Override
-    public String toString() {
-        return "User{" +
-                "id=" + id +
-                ", fullName='" + fullName + '\'' +
-                ", nickName='" + nickName + '\'' +
-                ", email='" + email + '\'' +
-                ", password='" + password + '\'' +
-                ", age=" + age +
-                ", status='" + status + '\'' +
-                ", role='" + role + '\'' + "}";
+    public String getUsername() {
+        return username;
+    }
+
+    @Override
+    public boolean isAccountNonExpired() {
+        return false;
+    }
+
+    @Override
+    public boolean isAccountNonLocked() {
+        return false;
+    }
+
+    @Override
+    public boolean isCredentialsNonExpired() {
+        return false;
+    }
+
+    @Override
+    public boolean isEnabled() {
+        return status.getName() == EStatus.ENABLED;
     }
 }

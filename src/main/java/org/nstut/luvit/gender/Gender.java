@@ -1,7 +1,13 @@
 package org.nstut.luvit.gender;
 
 import jakarta.persistence.*;
+import lombok.Getter;
+import lombok.Setter;
+import lombok.ToString;
 
+@Getter
+@Setter
+@ToString
 @Entity
 @Table(name="gender")
 public class Gender {
@@ -9,14 +15,7 @@ public class Gender {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Byte id;
 
+    @Enumerated(EnumType.STRING)
     @Column(name="name")
-    private String name;
-
-    // To String
-    @Override
-    public String toString() {
-        return "Gender{" +
-                "id=" + id +
-                ", name='" + name + '\'' + "}";
-    }
+    private EGender name;
 }

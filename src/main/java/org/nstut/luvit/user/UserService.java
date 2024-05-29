@@ -1,14 +1,19 @@
 package org.nstut.luvit.user;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
-import java.util.Optional;
 
 @Service
-public class UserService {
+public class UserService implements UserDetailsService {
 
+    private static final Logger LOGGER = LoggerFactory.getLogger(UserService.class);
     private final IUserRepository userRepository;
 
     @Autowired
@@ -16,32 +21,28 @@ public class UserService {
         this.userRepository = userRepository;
     }
 
-    public User createUser(User user) {
-        return userRepository.save(user);
+    @Override
+    public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
+        LOGGER.info("Loading user by username: {}", username);
+        UserDetails userDetails = userRepository.findByUsername(username)
+                .orElseThrow(() -> {
+                    LOGGER.error("User not found: {}", username);
+                    return new UsernameNotFoundException("User not found");
+                });
+        LOGGER.info("User loaded: {}", userDetails);
+        return userDetails;
     }
 
-    public Optional<User> getUser(Long id) {
-        return userRepository.findById(id);
-    }
-
-    public User updateUser(User user) {
-        return userRepository.save(user);
-    }
-
-    public void deleteUser(Long id) {
-        userRepository.deleteById(id);
+    public void save(User user) {
+        LOGGER.info("Saving user: {}", user);
+        userRepository.save(user);
+        LOGGER.info("User saved: {}", user);
     }
 
     public List<User> getAllUsers() {
-        return userRepository.findAll();
-    }
-
-    public User login(String email, String password) {
-        Optional<User> optionalUser = userRepository.findByEmailAndPassword(email, password);
-        if (optionalUser.isPresent()) {
-            return optionalUser.get();
-        } else {
-            throw new RuntimeException("Invalid email or password");
-        }
+        LOGGER.info("Getting all users");
+        List<User> users = userRepository.findAll();
+        LOGGER.info("Users retrieved: {}", users);
+        return users;
     }
 }
